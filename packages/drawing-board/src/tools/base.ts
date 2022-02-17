@@ -1,39 +1,55 @@
-export class Path {
-  public start: [number, number];
-  public end: [number, number];
+import type { Renderer } from "../renderer";
+
+export type Point = [number, number];
+
+export interface PathOptions {
+  start?: Point;
+  end?: Point;
+}
+
+export abstract class Path {
   public path2d = new Path2D();
-  public type: "stroke" | "fill";
+  public start;
+  public end;
 
   static _uid = 0;
 
-  constructor(type: "stroke" | "fill") {
-    this.start = [0, 0];
-    this.end = [0, 0];
-    this.type = type;
+  constructor(options: PathOptions) {
+    this.start = options.start;
+    this.end = options.end;
     Path._uid++;
+    this.init();
   }
 
-  setStart(point: [number, number]) {
-    this.start = point;
+  abstract init(): void;
+  abstract render(ctx: CanvasRenderingContext2D): void;
+}
+
+export class ToolBase {
+  protected renderer: Renderer | null = null;
+
+  enabled(renderer: Renderer) {
+    this.renderer = renderer;
   }
 
-  setEnd(point: [number, number]) {
-    this.end = point;
-  }
-
-  render(ctx: CanvasRenderingContext2D) {
-    ctx[this.type]?.(this.path2d);
+  disabled() {
+    this.renderer = null;
   }
 }
 
-export class ToolsBase {
-  public cb?: (path: Path) => void;
+export type Class<T extends ToolBase> = new (renderer: Renderer) => T;
 
-  onPathCreate(cb: (path: Path) => void) {
-    this.cb = cb;
+export class ToolApplication {
+  private renderer;
+  private tools = new Set<ToolBase>();
+
+  constructor(renderer: Renderer) {
+    this.renderer = renderer;
   }
-}
 
-export interface ToolsType extends ToolsBase {
-  new (view: HTMLCanvasElement): unknown;
+  switchTool(tool: ToolBase) {
+    Array.from(this.tools).forEach((toolItem) => toolItem.disabled());
+    !this.tools.has(tool) && this.tools.add(tool);
+    tool.enabled(this.renderer);
+  }
 }

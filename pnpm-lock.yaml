@@ -5,11 +5,13 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.12.0
   '@typescript-eslint/parser': ^5.12.0
   eslint: ^8.9.0
+  fit-curve: ^0.2.0
   lodash: ^4.17.21
   typescript: ^4.5.5
   vite: ^2.8.2
 
 dependencies:
+  fit-curve: 0.2.0
   lodash: 4.17.21
 
 devDependencies:
@@ -701,6 +703,10 @@ packages:
     dependencies:
       to-regex-range: 5.0.1
     dev: true
+
+  /fit-curve/0.2.0:
+    resolution: {integrity: sha1-1It+yHdekV0SZ2KGi7maM4vILQY=}
+    dev: false
 
   /flat-cache/3.0.4:
     resolution: {integrity: sha1-YbAzgwKy/p+Vfcwy/CqH8cMEixE=}

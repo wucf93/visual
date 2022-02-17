@@ -1,3 +1,4 @@
+import type { Path } from "./tools/base";
 export interface RenderOptions {
   /**
    * 元素宽度
@@ -9,16 +10,13 @@ export interface RenderOptions {
   height: number;
 }
 
-export interface RenderProps {
-  view: HTMLCanvasElement;
-  resize: (width: number, height: number) => void;
-}
-
 function createView({ width, height }: RenderOptions) {
   const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
   canvas.width = width;
   canvas.height = height;
-  return canvas;
+  if (!ctx) throw new Error("getContext(2d) 获取失败，请检查方法调用时机");
+  return { view: canvas, ctx };
 }
 
 function initStage(ctx: CanvasRenderingContext2D, dom: HTMLCanvasElement) {
@@ -33,14 +31,27 @@ function initStage(ctx: CanvasRenderingContext2D, dom: HTMLCanvasElement) {
   }
 }
 
-export function createRenderer(options: RenderOptions): RenderProps {
-  const view = createView(options);
+export class Renderer {
+  public view;
+  public sections: Array<Path>;
+  public ctx;
 
-  return {
-    view,
-    resize: function (width: number, height: number) {
-      this.view.width = width;
-      this.view.height = height;
-    },
-  };
+  constructor(options: RenderOptions) {
+    const { view, ctx } = createView(options);
+    this.view = view;
+    this.ctx = ctx;
+    this.sections = [];
+  }
+
+  render() {
+    this.ctx.clearRect(0, 0, this.view.width, this.view.height);
+    initStage(this.ctx, this.view);
+    this.sections.forEach((section) => section.render(this.ctx));
+  }
+
+  resize(width: number, height: number) {
+    this.view.width = width;
+    this.view.height = height;
+    this.render();
+  }
 }

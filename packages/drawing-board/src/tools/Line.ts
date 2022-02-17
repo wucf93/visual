@@ -1,94 +1,77 @@
 import { ToolBase, Path, Point, PathOptions } from "./base";
 import { Renderer } from "../renderer";
-import fitCurve from "fit-curve";
 
-type BezierPoints = ReturnType<typeof fitCurve>;
-
-interface PenToolOption {
+interface LineToolOption {
   strokeStyle: CanvasRenderingContext2D["fillStyle"];
   lineWidth: CanvasRenderingContext2D["lineWidth"];
 }
 
-interface PenPathOptions extends PathOptions {
-  bezierPoints?: BezierPoints;
-}
+type LinePathOptions = Omit<PathOptions, "type">;
 
-function renderBezierCurve(path2d: Path2D, bezierPoints: BezierPoints) {
-  bezierPoints.forEach(([begin, c1, c2, end]) => {
-    path2d.moveTo(begin[0], begin[1]);
-    path2d.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], end[0], end[1]);
-  });
-}
-
-export class PenPath extends Path {
+export class LinePath extends Path {
   public strokeStyle;
   public lineWidth;
-  public bezierPoints;
 
-  constructor(options: PenPathOptions & PenToolOption) {
+  constructor(options: LinePathOptions & LineToolOption) {
     super(options);
     this.strokeStyle = options.strokeStyle;
     this.lineWidth = options.lineWidth;
-    this.bezierPoints = options.bezierPoints;
   }
 
   init() {
-    this.bezierPoints && renderBezierCurve(this.path2d, this.bezierPoints);
+    if (this.start && this.end) {
+      this.path2d = new Path2D();
+      this.path2d.moveTo(this.start[0], this.start[1]);
+      this.path2d.lineTo(this.end[0], this.end[1]);
+    }
   }
 
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save();
     ctx.strokeStyle = this.strokeStyle;
     ctx.lineWidth = this.lineWidth;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    this.init();
     ctx.stroke(this.path2d);
     ctx.restore();
   }
 }
 
-export class PenTool extends ToolBase {
-  private currentPath?: PenPath;
-  private points: Array<Point> = [];
+export class LineTool extends ToolBase {
+  private currentPath?: LinePath;
   public strokeStyle;
   public lineWidth;
 
-  constructor(options?: Partial<PenToolOption>) {
+  constructor(options?: Partial<LineToolOption>) {
     super();
     this.strokeStyle = options?.strokeStyle || "#333";
-    this.lineWidth = options?.lineWidth || 2;
+    this.lineWidth = options?.lineWidth || 1;
   }
 
   private _downHander = (e: MouseEvent) => {
     if (e.button !== 0 || !this.renderer) return;
     const point: Point = [e.offsetX, e.offsetY];
-    this.currentPath = new PenPath({
+    this.currentPath = new LinePath({
       strokeStyle: this.strokeStyle,
       lineWidth: this.lineWidth,
     });
-    this.renderer.sections.push(this.currentPath);
     this.currentPath.start = point;
-    this.currentPath.path2d.moveTo(point[0], point[1]);
-    this.points = [];
+    this.renderer.sections.push(this.currentPath);
   };
 
   private _upHander = (e: MouseEvent) => {
     if (this.currentPath && e.button === 0 && this.renderer) {
-      const path2d = new Path2D();
-      const bezierPoints = fitCurve<Point>(this.points, 2);
-      renderBezierCurve(path2d, bezierPoints);
-      this.currentPath.path2d = path2d;
-      this.currentPath = undefined;
+      const point: Point = [e.offsetX, e.offsetY];
+      this.currentPath.end = point;
       this.renderer.render();
+      this.currentPath = undefined;
     }
   };
 
   private _moveHander = (e: MouseEvent) => {
     if (!this.currentPath || !this.renderer) return;
     const point: Point = [e.offsetX, e.offsetY];
-    this.points.push(point);
-    this.currentPath.path2d.lineTo(point[0], point[1]);
-    this.currentPath.render(this.renderer.ctx);
+    this.currentPath.end = point;
+    this.renderer.render();
   };
 
   public enabled(renderer: Renderer) {
@@ -101,7 +84,6 @@ export class PenTool extends ToolBase {
 
   public disabled() {
     if (this.renderer) {
-      console.log("remove");
       this.renderer.view.removeEventListener("mousedown", this._downHander);
       this.renderer.view.removeEventListener("mousemove", this._moveHander);
       this.renderer.view.removeEventListener("mouseup", this._upHander);
