@@ -1,18 +1,16 @@
 import { ToolBase, Path, Point, PathOptions } from "./base";
 import { Renderer } from "../renderer";
 
-interface LineToolOption {
+interface LineToolOption  {
   strokeStyle: CanvasRenderingContext2D["fillStyle"];
   lineWidth: CanvasRenderingContext2D["lineWidth"];
 }
-
-type LinePathOptions = Omit<PathOptions, "type">;
 
 export class LinePath extends Path {
   public strokeStyle;
   public lineWidth;
 
-  constructor(options: LinePathOptions & LineToolOption) {
+  constructor(options: PathOptions & LineToolOption) {
     super(options);
     this.strokeStyle = options.strokeStyle;
     this.lineWidth = options.lineWidth;

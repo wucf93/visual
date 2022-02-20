@@ -1,6 +1,6 @@
 import "./index.less";
 import { createDraw } from "./src/draw";
-import { PenTool, LineTool } from "./src/tools";
+import { Square } from "./src/tools";
 
 window.onload = () => {
   const draw = createDraw({
@@ -9,6 +9,5 @@ window.onload = () => {
   });
   document.body.append(draw.view);
 
-  const line = new LineTool({ lineWidth: 10, strokeStyle: "red" });
-  draw.tool.switchTool(line);
+  draw.tool.switchTool(Square, { fillStyle: "red" });
 };

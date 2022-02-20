@@ -1,4 +1,4 @@
-import type { Path } from "./tools/base";
+import type { DrawPathBase } from "./tools/base";
 export interface RenderOptions {
   /**
    * 元素宽度
@@ -33,7 +33,7 @@ function initStage(ctx: CanvasRenderingContext2D, dom: HTMLCanvasElement) {
 
 export class Renderer {
   public view;
-  public sections: Array<Path>;
+  public sections: Array<DrawPathBase>;
   public ctx;
 
   constructor(options: RenderOptions) {

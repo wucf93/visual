@@ -2,8 +2,6 @@ import { ToolBase, Path, Point, PathOptions } from "./base";
 import { Renderer } from "../renderer";
 import fitCurve from "fit-curve";
 
-type BezierPoints = ReturnType<typeof fitCurve>;
-
 interface PenToolOption {
   strokeStyle: CanvasRenderingContext2D["fillStyle"];
   lineWidth: CanvasRenderingContext2D["lineWidth"];
