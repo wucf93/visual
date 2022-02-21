@@ -1,6 +1,5 @@
 import type { Renderer } from "../renderer";
 import { ToolOptions, DrawPathBase } from "./base";
-import { Square } from './square';
 
 export type Class<T extends DrawPathBase> = new (options: ToolOptions) => T;
 
@@ -45,6 +44,5 @@ export class ToolApplication {
 
 
 export * from "./pen";
-export * from "./line";
-
-export { Square }
+export * from './square';
+export * from './line';

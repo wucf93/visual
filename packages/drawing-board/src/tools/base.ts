@@ -77,7 +77,7 @@ export abstract class DrawPathBase {
 
     if (type === "MOVE" && button === 0) {
       this.width = offsetX - this.x < 10 ? 10 : offsetX - this.x;
-      this.height = offsetY - this.y < 10 ? 10 : offsetY - this.x;
+      this.height = offsetY - this.y < 10 ? 10 : offsetY - this.y;
       renderer.render();
     }
   }

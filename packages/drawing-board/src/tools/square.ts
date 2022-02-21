@@ -14,7 +14,8 @@ export class Square extends DrawPathBase {
     }
 
     get path2d() {
-        return new Path2D(`M0 0 h ${this.width} v ${this.width} h -${this.width} Z`);
+        console.log(this.x, this.y, this.width, this.height)
+        return new Path2D(`M0 0 h ${this.width} v ${this.height} h ${-this.width} Z`);
     }
 }
 

@@ -35,6 +35,7 @@ export class Renderer {
   public view;
   public sections: Array<DrawPathBase>;
   public ctx;
+  private isRender: boolean = false;
 
   constructor(options: RenderOptions) {
     const { view, ctx } = createView(options);
@@ -44,9 +45,13 @@ export class Renderer {
   }
 
   render() {
-    this.ctx.clearRect(0, 0, this.view.width, this.view.height);
-    initStage(this.ctx, this.view);
-    this.sections.forEach((section) => section.render(this.ctx));
+    if (this.isRender) return;
+    window.requestAnimationFrame(() => {
+      this.ctx.clearRect(0, 0, this.view.width, this.view.height);
+      initStage(this.ctx, this.view);
+      this.sections.forEach((section) => section.render(this.ctx));
+      this.isRender = false;
+    })
   }
 
   resize(width: number, height: number) {
