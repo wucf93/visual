@@ -1,16 +1,10 @@
 import { DrawPathBase, ToolOptions } from "./base";
 
 export class Square extends DrawPathBase {
-    public strokeStyle;
-    public fillStyle;
     public lineWidth: CanvasRenderingContext2D["lineWidth"] = 1;
 
-    constructor(options: ToolOptions) {
-        super();
-        this.width = 50;
-        this.height = 50;
-        this.strokeStyle = options.strokeStyle;
-        this.fillStyle = options.fillStyle;
+    constructor(options?: ToolOptions) {
+        super(options);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {

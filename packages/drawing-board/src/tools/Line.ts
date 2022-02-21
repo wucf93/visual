@@ -2,13 +2,8 @@ import { DrawPathBase, ToolOptions } from "./base";
 import type { Renderer } from "../renderer";
 
 export class Line extends DrawPathBase {
-  public strokeStyle;
-  public lineWidth;
-
-  constructor(options: ToolOptions) {
-    super();
-    this.strokeStyle = options.strokeStyle;
-    this.lineWidth = options.lineWidth || 1;
+  constructor(options?: Omit<ToolOptions, "fillStyle">) {
+    super(options);
   }
 
   draw(ctx: CanvasRenderingContext2D): void {

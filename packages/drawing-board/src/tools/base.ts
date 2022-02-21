@@ -14,11 +14,17 @@ export abstract class DrawPathBase {
   public height = 0;
   public scale = { x: 1, y: 1 };
   public _uid;
+  public fillStyle?;
+  public strokeStyle?;
+  public lineWidth?;
 
   static _uid = 0;
 
-  constructor() {
+  constructor(options?: ToolOptions) {
     this._uid = DrawPathBase._uid++;
+    this.fillStyle = options?.fillStyle;
+    this.strokeStyle = options?.strokeStyle;
+    this.lineWidth = options?.lineWidth;
   }
 
   abstract draw(ctx: CanvasRenderingContext2D): void;
@@ -28,6 +34,9 @@ export abstract class DrawPathBase {
     ctx.translate(this.x, this.y);
     ctx.scale(this.scale.x, this.scale.y);
     ctx.moveTo(0, 0);
+    this.fillStyle && (ctx.fillStyle = this.fillStyle);
+    this.strokeStyle && (ctx.strokeStyle = this.strokeStyle);
+    this.lineWidth && (ctx.lineWidth = this.lineWidth);
     this.draw(ctx);
     ctx.restore();
   }

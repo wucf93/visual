@@ -1,19 +1,19 @@
 import type { Renderer } from "../renderer";
 import { ToolOptions, DrawPathBase } from "./base";
 
-export type Class<T extends DrawPathBase> = new (options: ToolOptions) => T;
+export type Class<T> = new (...arg: any[]) => T;
 
 export class ToolApplication {
     private renderer;
     public currentTool?: Class<DrawPathBase>;
-    private options: ToolOptions = {};
+    private options?: ToolOptions;
 
     constructor(renderer: Renderer) {
         this.renderer = renderer;
         this.initEvent();
     }
 
-    switchTool(Tool: Class<DrawPathBase>, options: ToolOptions) {
+    switchTool<T extends Class<DrawPathBase>>(Tool: T, options?: ConstructorParameters<T>[0]) {
         this.currentTool = Tool;
         this.options = options;
     }
@@ -24,7 +24,7 @@ export class ToolApplication {
             if (this.currentTool) {
                 instance = new this.currentTool(this.options);
                 this.renderer.sections.push(instance);
-                instance.on("DOWN", this.renderer, e);
+                instance?.on("DOWN", this.renderer, e);
             }
         });
         this.renderer.view.addEventListener("mousemove", (e) => {

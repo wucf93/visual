@@ -3,21 +3,19 @@ import type { Renderer } from "../renderer";
 import fitCurve from "fit-curve";
 
 export class Pen extends DrawPathBase {
-  public strokeStyle;
-  public lineWidth;
   public bezierPoints?: Array<[Point, Point, Point, Point]>;
   private _pointList: Array<Point> = [];
   private _path2d: Path2D = new Path2D();
 
-  constructor(options: ToolOptions) {
-    super();
-    this.strokeStyle = options.strokeStyle;
-    this.lineWidth = options.lineWidth || 1;
+  constructor(options?: ToolOptions) {
+    super(options);
   }
 
   draw(ctx: CanvasRenderingContext2D) {
     if (this.bezierPoints) {
-      this._path2d = new Path2D(this.bezierPoints.reduce((y, [begin, c1, c2, end]) => y + `M${begin[0]} ${begin[1]} C ${c1[0]} ${c1[1]}, ${c2[0]} ${c2[1]}, ${end[0]} ${end[1]} `, ""));
+      this._path2d = new Path2D(this.bezierPoints.reduce(
+        (y, [begin, c1, c2, end]) => y + `M${begin[0]} ${begin[1]} C ${c1[0]} ${c1[1]}, ${c2[0]} ${c2[1]}, ${end[0]} ${end[1]} `, "")
+      );
     }
     ctx.lineCap = "round";
     ctx.lineJoin = "round";

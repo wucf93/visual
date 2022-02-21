@@ -10,6 +10,6 @@ window.onload = () => {
   document.body.append(draw.view);
 
   draw.tool.switchTool(Square, { fillStyle: "red" });
-  draw.tool.switchTool(Line, { strokeStyle: "red" });
   draw.tool.switchTool(Pen, { strokeStyle: "red" });
+  draw.tool.switchTool(Line, { strokeStyle: "red", lineWidth: 2 });
 };
