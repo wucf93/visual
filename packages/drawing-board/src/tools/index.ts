@@ -16,7 +16,6 @@ export class ToolApplication {
     switchTool(Tool: Class<DrawPathBase>, options: ToolOptions) {
         this.currentTool = Tool;
         this.options = options;
-
     }
 
     initEvent() {
@@ -41,7 +40,6 @@ export class ToolApplication {
         });
     }
 }
-
 
 export * from "./pen";
 export * from './square';

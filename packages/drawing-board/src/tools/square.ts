@@ -13,9 +13,10 @@ export class Square extends DrawPathBase {
         this.fillStyle = options.fillStyle;
     }
 
-    get path2d() {
-        console.log(this.x, this.y, this.width, this.height)
-        return new Path2D(`M0 0 h ${this.width} v ${this.height} h ${-this.width} Z`);
+    draw(ctx: CanvasRenderingContext2D): void {
+        const path2d = new Path2D(`M0 0 h ${this.width} v ${this.height} h ${-this.width} Z`);
+        ctx.fill(path2d);
+        ctx.stroke(path2d);
     }
 }
 

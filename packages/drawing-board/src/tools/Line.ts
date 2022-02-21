@@ -11,8 +11,9 @@ export class Line extends DrawPathBase {
     this.lineWidth = options.lineWidth || 1;
   }
 
-  get path2d() {
-    return new Path2D(`M0 0 l ${this.width} ${this.height}`);
+  draw(ctx: CanvasRenderingContext2D): void {
+    ctx.lineTo(this.width, this.height);
+    ctx.stroke();
   }
 
   on(type: "DOWN" | 'UP' | 'MOVE', renderer: Renderer, e: MouseEvent) {
@@ -20,7 +21,6 @@ export class Line extends DrawPathBase {
     if (type === 'DOWN' && button === 0) {
       this.x = offsetX;
       this.y = offsetY;
-      renderer.render();
     }
 
     if (type === "MOVE" && button === 0) {

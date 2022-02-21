@@ -1,46 +1,10 @@
 import type { Renderer } from "../renderer";
 
 export type Point = [number, number];
-
 export interface ToolOptions {
   fillStyle?: CanvasRenderingContext2D["fillStyle"];
   strokeStyle?: CanvasRenderingContext2D["strokeStyle"];
   lineWidth?: CanvasRenderingContext2D["lineWidth"];
-}
-
-export interface PathOptions {
-  start?: Point;
-  end?: Point;
-}
-
-export abstract class Path {
-  public path2d = new Path2D();
-  public start;
-  public end;
-
-  static _uid = 0;
-
-  constructor(options: PathOptions) {
-    this.start = options.start;
-    this.end = options.end;
-    Path._uid++;
-    this.init();
-  }
-
-  abstract init(): void;
-  abstract render(ctx: CanvasRenderingContext2D): void;
-}
-
-export class ToolBase {
-  protected renderer: Renderer | null = null;
-
-  enabled(renderer: Renderer) {
-    this.renderer = renderer;
-  }
-
-  disabled() {
-    this.renderer = null;
-  }
 }
 
 export abstract class DrawPathBase {
@@ -51,19 +15,20 @@ export abstract class DrawPathBase {
   public scale = { x: 1, y: 1 };
   public _uid;
 
-  public abstract path2d: Path2D;
   static _uid = 0;
 
   constructor() {
     this._uid = DrawPathBase._uid++;
   }
 
+  abstract draw(ctx: CanvasRenderingContext2D): void;
+
   render(ctx: CanvasRenderingContext2D) {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.scale(this.scale.x, this.scale.y);
-    ctx.fill(this.path2d);
-    ctx.stroke(this.path2d);
+    ctx.moveTo(0, 0);
+    this.draw(ctx);
     ctx.restore();
   }
 
