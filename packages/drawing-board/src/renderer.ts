@@ -1,4 +1,3 @@
-import type { DrawPathBase } from "./tools/base";
 export interface RenderOptions {
   /**
    * 元素宽度
@@ -31,17 +30,48 @@ function initStage(ctx: CanvasRenderingContext2D, dom: HTMLCanvasElement) {
   }
 }
 
+let _uid = 0;
+export function createDrawPath<T extends Record<string | number, any>>(onRender: (ctx: CanvasRenderingContext2D) => void, options?: T) {
+  console.log(options);
+  return {
+    ...options,
+    _uid: _uid + 1,
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    scale: { x: 1, y: 1 },
+    render(ctx: CanvasRenderingContext2D) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.scale(this.scale.x, this.scale.y);
+      ctx.moveTo(0, 0);
+      onRender(ctx);
+      ctx.restore();
+    }
+  }
+}
+export type DrawPath = ReturnType<typeof createDrawPath>;
+
 export class Renderer {
   public view;
-  public sections: Array<DrawPathBase>;
   public ctx;
   private isRender: boolean = false;
+  private drawMap: Map<number, DrawPath> = new Map();
+  private drawList: Set<DrawPath> = new Set();
 
   constructor(options: RenderOptions) {
     const { view, ctx } = createView(options);
     this.view = view;
     this.ctx = ctx;
-    this.sections = [];
+  }
+
+  exec(type: "add", drapPath: DrawPath): void;
+  exec(type: "add", params: DrawPath) {
+    if (type === "add") {
+      this.drawMap.set(params._uid, params);
+      this.drawList.add(params);
+    }
   }
 
   render() {
@@ -49,9 +79,13 @@ export class Renderer {
     window.requestAnimationFrame(() => {
       this.ctx.clearRect(0, 0, this.view.width, this.view.height);
       initStage(this.ctx, this.view);
-      this.sections.forEach((section) => section.render(this.ctx));
+      this.drawList.forEach(drap => drap.render(this.ctx))
       this.isRender = false;
     })
+  }
+
+  getDrawPath(id?: number) {
+    return id === undefined ? id : this.drawMap.get(id);
   }
 
   resize(width: number, height: number) {

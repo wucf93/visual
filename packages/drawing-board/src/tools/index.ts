@@ -1,46 +1,45 @@
 import type { Renderer } from "../renderer";
-import { ToolOptions, DrawPathBase } from "./base";
+import { ToolBase } from "./base";
 
 export type Class<T> = new (...arg: any[]) => T;
 
 export class ToolApplication {
     private renderer;
-    public currentTool?: Class<DrawPathBase>;
-    private options?: ToolOptions;
+    public currentTool?: ToolBase;
 
     constructor(renderer: Renderer) {
         this.renderer = renderer;
         this.initEvent();
     }
 
-    switchTool<T extends Class<DrawPathBase>>(Tool: T, options?: ConstructorParameters<T>[0]) {
-        this.currentTool = Tool;
-        this.options = options;
+    switchTool<T extends Class<ToolBase>>(Tool: T, ...rest: ConstructorParameters<T>) {
+        this.currentTool = new Tool(...rest);
     }
 
     initEvent() {
-        let instance: DrawPathBase | null = null;
         this.renderer.view.addEventListener("mousedown", (e) => {
-            if (this.currentTool) {
-                instance = new this.currentTool(this.options);
-                this.renderer.sections.push(instance);
-                instance?.on("DOWN", this.renderer, e);
+            if (e.button === 0) {
+                this.currentTool?.onDown?.(this.renderer, [e.offsetX, e.offsetY], e)
             }
         });
         this.renderer.view.addEventListener("mousemove", (e) => {
-            instance?.on("MOVE", this.renderer, e)
+            if (e.button === 0) {
+                this.currentTool?.onMove?.(this.renderer, [e.offsetX, e.offsetY], e)
+            }
         });
         this.renderer.view.addEventListener("mouseup", (e) => {
-            instance?.on("UP", this.renderer, e)
-            instance && (instance = null);
+            if (e.button === 0) {
+                this.currentTool?.onUp?.(this.renderer, [e.offsetX, e.offsetY], e)
+            }
         });
         this.renderer.view.addEventListener("mouseout", (e) => {
-            instance?.on("OUT", this.renderer, e)
-            instance && (instance = null);
+            if (e.button === 0) {
+                this.currentTool?.onOut?.(this.renderer, [e.offsetX, e.offsetY], e)
+            }
         });
     }
 }
 
-export * from "./pen";
-export * from './square';
+// export * from "./pen";
+// export * from './square';
 export * from './line';

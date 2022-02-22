@@ -1,28 +1,53 @@
-import { DrawPathBase, ToolOptions } from "./base";
-import type { Renderer } from "../renderer";
+import { ToolBase, Point } from "./base";
+import { Renderer, createDrawPath } from "../renderer";
 
-export class Line extends DrawPathBase {
-  constructor(options?: Omit<ToolOptions, "fillStyle">) {
-    super(options);
+export interface LineToolOptions {
+  strokeStyle?: CanvasRenderingContext2D["strokeStyle"];
+  lineWidth?: CanvasRenderingContext2D["lineWidth"];
+}
+
+export class LineTool implements ToolBase {
+  public strokeStyle;
+  public lineWidth;
+  private drawId?: number;
+
+  constructor(options?: LineToolOptions) {
+    this.strokeStyle = options?.strokeStyle;
+    this.lineWidth = options?.lineWidth;
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
-    ctx.lineTo(this.width, this.height);
-    ctx.stroke();
+  onDown(renderer: Renderer, [x, y]: Point) {
+    const drapPath = createDrawPath<LineToolOptions>(
+      (ctx) => {
+        ctx.strokeStyle = drapPath.strokeStyle;
+        ctx.lineWidth = drapPath.lineWidth;
+        ctx.lineTo(drapPath.width, drapPath.height);
+        ctx.stroke();
+      }, { strokeStyle: this.strokeStyle, lineWidth: this.lineWidth }
+    )
+    drapPath.x = x;
+    drapPath.y = y;
+    this.drawId = drapPath._uid;
+    renderer.exec("add", drapPath)
   }
 
-  on(type: "DOWN" | 'UP' | 'MOVE', renderer: Renderer, e: MouseEvent) {
-    const { button, offsetX, offsetY } = e;
-    if (type === 'DOWN' && button === 0) {
-      this.x = offsetX;
-      this.y = offsetY;
-    }
-
-    if (type === "MOVE" && button === 0) {
-      this.width = offsetX - this.x;
-      this.height = offsetY - this.y;
+  onMove(renderer: Renderer, [x, y]: Point) {
+    let drapPath;
+    if (this.drawId && (drapPath = renderer.getDrawPath(this.drawId))) {
+      drapPath.width = x - drapPath.x;
+      drapPath.height = y - drapPath.y;
       renderer.render();
     }
   }
-}
 
+  onUp(renderer:Renderer,[x, y]: Point){
+    let drapPath;
+    if (this.drawId && (drapPath = renderer.getDrawPath(this.drawId))) {
+      drapPath.width = x - drapPath.x;
+      drapPath.height = y - drapPath.y;
+      this.drawId = undefined;
+      renderer.render();
+    }
+  }
+
+}
