@@ -1,5 +1,9 @@
 import { ToolBase, ToolEvent } from "./base";
-import { CloseElement, CloseElementOptions } from "../elements";
+import { RectElement, CloseElementOptions, CloseElement } from "../elements";
+
+const CloseType = {
+  "RECT": RectElement
+}
 
 export class CloseTool implements ToolBase {
   private closeElement: CloseElement | null = null;
@@ -8,7 +12,7 @@ export class CloseTool implements ToolBase {
   public fillStyle;
   public closeType;
 
-  constructor(options: CloseElementOptions) {
+  constructor(options: CloseElementOptions & { closeType: keyof typeof CloseType }) {
     this.strokeStyle = options?.strokeStyle;
     this.lineWidth = options?.lineWidth;
     this.fillStyle = options?.fillStyle;
@@ -16,11 +20,10 @@ export class CloseTool implements ToolBase {
   }
 
   onDragStart({ renderer, offsetX, offsetY }: ToolEvent) {
-    this.closeElement = new CloseElement({
+    this.closeElement = new CloseType[this.closeType]({
       strokeStyle: this.strokeStyle,
       lineWidth: this.lineWidth,
       fillStyle: this.fillStyle,
-      closeType: this.closeType,
       x: offsetX,
       y: offsetY,
     });
@@ -39,9 +42,6 @@ export class CloseTool implements ToolBase {
 
   onDragEnd({ renderer }: ToolEvent) {
     if (this.closeElement) {
-      this.closeElement.width === 0 &&
-        this.closeElement.height === 0 &&
-        renderer.removeElement(this.closeElement);
       this.closeElement = null;
     }
   }

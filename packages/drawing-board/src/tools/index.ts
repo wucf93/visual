@@ -49,3 +49,4 @@ export class ToolApplication {
 export * from "./pen";
 export * from './close';
 export * from "./staright";
+export * from './eraser';

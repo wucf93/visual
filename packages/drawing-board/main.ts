@@ -1,5 +1,5 @@
 import { createDraw } from "./src/draw";
-import { StarightTool, PenTool, CloseTool } from "./src/tools";
+import { StarightTool, PenTool, CloseTool, EraserTool } from "./src/tools";
 import "./index.less";
 
 window.onload = () => {
@@ -9,7 +9,16 @@ window.onload = () => {
   });
   document.body.append(draw.view);
 
-  // draw.tool.switchTool(CloseTool, { closeType: "RECT", fillStyle: "red" });
-  // draw.tool.switchTool(StarightTool, { strokeStyle: "red", lineWidth: 10 });
-  // draw.tool.switchTool(PenTool, { strokeStyle: "red", lineWidth: 2 });
+  document.querySelector("button#pen")?.addEventListener("click", () => {
+    draw.tool.switchTool(PenTool, { strokeStyle: "red", lineWidth: 10 });
+  })
+  document.querySelector("button#eraser")?.addEventListener("click", () => {
+    draw.tool.switchTool(EraserTool);
+  })
+  document.querySelector("button#rect")?.addEventListener("click", () => {
+    draw.tool.switchTool(CloseTool, { closeType: "RECT", fillStyle: "red", lineWidth: 20, strokeStyle: "yellow" });
+  })
+  document.querySelector("button#staright")?.addEventListener("click", () => {
+    draw.tool.switchTool(StarightTool, { strokeStyle: "red", lineWidth: 10 });
+  })
 };

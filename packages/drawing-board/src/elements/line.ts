@@ -27,34 +27,41 @@ export class LineElement<T> extends BaseElement {
     this.strokeStyle && (ctx.strokeStyle = this.strokeStyle);
     this.lineWidth && (ctx.lineWidth = this.lineWidth);
   }
+
+  get path2d(): Path2D {
+    throw new Error("Method not implemented.");
+  }
 }
 
 export class StarightElement extends LineElement<[Point, Point]> {
+
+  get path2d(): Path2D {
+    return new Path2D(this.points.map(([begin, end]) => `M ${begin.join(' ')} L ${end.join(' ')}`).join(' '))
+  }
+
   draw(ctx: CanvasRenderingContext2D) {
     if (this.points.length === 0) return;
     super.draw(ctx);
     ctx.beginPath();
-    this.points.forEach(([begin, end]) => {
-      ctx.moveTo(...begin);
-      ctx.lineTo(...end);
-    });
-    ctx.stroke();
+    ctx.stroke(this.path2d);
   }
 }
 
 export class BezierLineElement extends LineElement<
   [Point, Point, Point, Point]
 > {
+  get path2d(): Path2D {
+    return new Path2D(
+      this.points.map(([begin, c1, c2, end]) => `M ${begin.join(' ')} C ${c1.join(' ')} , ${c2.join(' ')} , ${end.join(' ')}`).join(' ')
+    )
+  }
+
   draw(ctx: CanvasRenderingContext2D) {
     if (this.points.length === 0) return;
     super.draw(ctx);
     ctx.beginPath();
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    this.points.forEach(([begin, c1, c2, end]) => {
-      ctx.moveTo(...begin);
-      ctx.bezierCurveTo(...c1, ...c2, ...end);
-    });
-    ctx.stroke();
+    ctx.stroke(this.path2d);
   }
 }

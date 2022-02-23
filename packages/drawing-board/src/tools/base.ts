@@ -3,6 +3,7 @@ import type { Renderer } from "../renderer";
 export type Point = [number, number];
 
 export type ToolEvent = MouseEvent & { renderer: Renderer };
+
 export interface ToolBase {
   onClick?(e: ToolEvent): void;
   onMouseDown?(e: ToolEvent): void;

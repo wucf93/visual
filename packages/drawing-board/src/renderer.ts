@@ -27,11 +27,12 @@ function initStage(ctx: CanvasRenderingContext2D, dom: HTMLCanvasElement) {
     }
   }
 }
+
 export class Renderer {
   public view;
   public ctx;
-  private isRender = false;
-  private drawList: Set<BaseElement> = new Set();
+  private _renderStore: Array<BaseElement> = [];
+  private _isRender = false;
 
   constructor(options: RenderOptions) {
     const { view, ctx } = createView(options);
@@ -39,25 +40,29 @@ export class Renderer {
     this.ctx = ctx;
   }
 
-  exec(type: "add", drapPath: BaseElement): void;
-  exec(type: "add", params: BaseElement) {
+
+  exec(type: "add" | "remove", params: BaseElement) {
     if (type === "add") {
-      this.drawList.add(params);
+      this._renderStore.push(params);
+    } else if (type === "remove") {
+      this._renderStore = this._renderStore.filter(item => item !== params)
     }
   }
 
   render() {
-    if (this.isRender) return;
+    if (this._isRender) return;
     window.requestAnimationFrame(() => {
       this.ctx.clearRect(0, 0, this.view.width, this.view.height);
       initStage(this.ctx, this.view);
-      this.drawList.forEach((drap) => drap.render(this.ctx));
-      this.isRender = false;
+      this._renderStore.forEach((drap) => drap.render(this.ctx));
+      this._isRender = false;
     });
   }
 
-  removeElement(ele: BaseElement) {
-    this.drawList.delete(ele);
+  findElement(callback: (value: BaseElement) => boolean) {
+    for (let i = this._renderStore.length - 1; i >= 0; i--) {
+      if (callback(this._renderStore[i])) return this._renderStore[i]
+    }
   }
 
   resize(width: number, height: number) {

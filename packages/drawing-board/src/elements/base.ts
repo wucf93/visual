@@ -22,12 +22,13 @@ export abstract class BaseElement {
     this.height = options?.width || 0;
   }
 
-  abstract draw(ctx: CanvasRenderingContext2D): void;
-
   render(ctx: CanvasRenderingContext2D) {
     if (this.width === 0 && this.height === 0) return;
     ctx.save();
     this.draw(ctx);
     ctx.restore();
   }
+
+  abstract draw(ctx: CanvasRenderingContext2D): void;
+  abstract get path2d(): Path2D;
 }

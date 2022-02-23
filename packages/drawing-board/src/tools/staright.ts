@@ -41,11 +41,8 @@ export class StarightTool implements ToolBase {
     }
   }
 
-  onDragEnd({ renderer, offsetX, offsetY }: ToolEvent) {
+  onDragEnd({ offsetX, offsetY }: ToolEvent) {
     if (this.starightElement) {
-      this.starightElement.width === 0 &&
-        this.starightElement.height === 0 &&
-        renderer.removeElement(this.starightElement);
       offsetX <= this.starightElement.x && (this.starightElement.x = offsetX);
       offsetY <= this.starightElement.y && (this.starightElement.y = offsetY);
       this.starightElement = null;
