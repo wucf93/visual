@@ -1,15 +1,14 @@
 import type { Renderer } from "../renderer";
 
 export type Point = [number, number];
-export interface ToolOptions {
-  fillStyle?: CanvasRenderingContext2D["fillStyle"];
-  strokeStyle?: CanvasRenderingContext2D["strokeStyle"];
-  lineWidth?: CanvasRenderingContext2D["lineWidth"];
-}
 
+export type ToolEvent = MouseEvent & { renderer: Renderer };
 export interface ToolBase {
-  onDown?(renderer: Renderer, point: Point, e: MouseEvent): void;
-  onMove?(renderer: Renderer, point: Point, e: MouseEvent): void;
-  onUp?(renderer: Renderer, point: Point, e: MouseEvent): void;
-  onOut?(renderer: Renderer, point: Point, e: MouseEvent): void;
+  onClick?(e: ToolEvent): void;
+  onMouseDown?(e: ToolEvent): void;
+  onMouseUp?(e: ToolEvent): void;
+  onMouseMove?(e: ToolEvent): void;
+  onDragStart?(e: ToolEvent): void;
+  onDragMove?(e: ToolEvent): void;
+  onDragEnd?(e: ToolEvent): void;
 }

@@ -1,49 +1,58 @@
-import { DrawPathBase, ToolOptions, Point } from "./base";
-import type { Renderer } from "../renderer";
+import { ToolBase, Point, ToolEvent } from "./base";
+import { BezierLineElement, LineElementOptions } from "../elements";
 import fitCurve from "fit-curve";
+export class PenTool implements ToolBase {
+  public strokeStyle;
+  public lineWidth;
+  private points: Array<Point> = [];
 
-export class Pen extends DrawPathBase {
-  public bezierPoints?: Array<[Point, Point, Point, Point]>;
-  private _pointList: Array<Point> = [];
-  private _path2d: Path2D = new Path2D();
-
-  constructor(options?: ToolOptions) {
-    super(options);
+  constructor(options?: LineElementOptions) {
+    this.strokeStyle = options?.strokeStyle;
+    this.lineWidth = options?.lineWidth;
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    if (this.bezierPoints) {
-      this._path2d = new Path2D(this.bezierPoints.reduce(
-        (y, [begin, c1, c2, end]) => y + `M${begin[0]} ${begin[1]} C ${c1[0]} ${c1[1]}, ${c2[0]} ${c2[1]}, ${end[0]} ${end[1]} `, "")
-      );
-    }
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.stroke(this._path2d);
+  onDragStart({ renderer, offsetX, offsetY }: ToolEvent) {
+    renderer.ctx.save();
+    renderer.ctx.beginPath();
+    renderer.ctx.moveTo(offsetX, offsetY);
+    this.strokeStyle && (renderer.ctx.strokeStyle = this.strokeStyle);
+    this.lineWidth && (renderer.ctx.lineWidth = this.lineWidth);
+    this.points = [[offsetX, offsetY]];
   }
 
-  on(type: "DOWN" | 'UP' | 'MOVE', renderer: Renderer, e: MouseEvent) {
-    const { button, offsetX, offsetY } = e;
-    if (type === 'DOWN' && button === 0) {
-      this.x = offsetX;
-      this.y = offsetY;
-      this._pointList.push([0, 0]);
-    }
+  onDragMove({ renderer, offsetX, offsetY }: ToolEvent) {
+    this.points.push([offsetX, offsetY]);
+    renderer.ctx.lineTo(offsetX, offsetY);
+    renderer.ctx.stroke();
+  }
 
-    if (type === "MOVE" && button === 0) {
-      const x = offsetX - this.x;
-      const y = offsetY - this.y;
-      this._pointList.push([x, y]);
-      this._path2d.lineTo(x, y);
-      this.render(renderer.ctx);
-    }
-
-    if (type === "UP" && button === 0) {
-      const x = offsetX - this.x;
-      const y = offsetY - this.y;
-      this._pointList.push([x, y]);
-      this.bezierPoints = fitCurve<Point>(this._pointList, 2);
-      renderer.render();
-    }
+  onDragEnd({ renderer }: ToolEvent) {
+    renderer.ctx.restore();
+    if (this.points.length < 2) return;
+    const { x1, y1, x2, y2 } = this.points.reduce(
+      (r, [x, y]) => ({
+        x1: x <= r.x1 ? x : r.x1,
+        x2: x >= r.x2 ? x : r.x2,
+        y1: y <= r.y1 ? y : r.y1,
+        y2: y >= r.y2 ? y : r.y2,
+      }),
+      {
+        x1: this.points[0][0],
+        x2: this.points[0][0],
+        y1: this.points[0][1],
+        y2: this.points[0][1],
+      }
+    );
+    const bezierLineElement = new BezierLineElement({
+      strokeStyle: this.strokeStyle,
+      lineWidth: this.lineWidth,
+      x: x1,
+      y: y1,
+      width: x2 - x1,
+      height: y2 - y1,
+      points: fitCurve<Point>(this.points, 2),
+    });
+    renderer.exec("add", bezierLineElement);
+    renderer.render();
   }
 }
