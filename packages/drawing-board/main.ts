@@ -1,5 +1,5 @@
 import { createDraw } from "./src/draw";
-import { StarightTool, PenTool, CloseTool, EraserTool } from "./src/tools";
+import { StarightTool, PenTool, CloseTool, EraserTool, SelectTool } from "./src/tools";
 import "./index.less";
 
 window.onload = () => {
@@ -20,5 +20,8 @@ window.onload = () => {
   })
   document.querySelector("button#staright")?.addEventListener("click", () => {
     draw.tool.switchTool(StarightTool, { strokeStyle: "red", lineWidth: 10 });
+  })
+  document.querySelector("button#select")?.addEventListener("click", () => {
+    draw.tool.switchTool(SelectTool);
   })
 };

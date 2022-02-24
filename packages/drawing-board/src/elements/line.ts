@@ -11,10 +11,11 @@ export interface LineElementOptions {
   lineWidth?: CanvasRenderingContext2D["lineWidth"];
 }
 
-export class LineElement<T> extends BaseElement {
+export abstract class LineElement<T> extends BaseElement {
   public strokeStyle;
   public lineWidth;
   public points: Array<T>;
+  protected abstract get path2d(): Path2D;
 
   constructor(options?: LineElementOptions & BaseElementOptions & Points<T>) {
     super(options);
@@ -28,15 +29,18 @@ export class LineElement<T> extends BaseElement {
     this.lineWidth && (ctx.lineWidth = this.lineWidth);
   }
 
-  get path2d(): Path2D {
-    throw new Error("Method not implemented.");
+  isPointIn(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    ctx.save();
+    this.lineWidth && (ctx.lineWidth = this.lineWidth);
+    const status = ctx.isPointInStroke(this.path2d, x, y);
+    ctx.restore();
+    return status;
   }
 }
 
 export class StarightElement extends LineElement<[Point, Point]> {
-
   get path2d(): Path2D {
-    return new Path2D(this.points.map(([begin, end]) => `M ${begin.join(' ')} L ${end.join(' ')}`).join(' '))
+    return new Path2D(this.points.map(([begin, end]) => `M ${begin.join(" ")} L ${end.join(" ")}`).join(" "));
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -47,13 +51,13 @@ export class StarightElement extends LineElement<[Point, Point]> {
   }
 }
 
-export class BezierLineElement extends LineElement<
-  [Point, Point, Point, Point]
-> {
+export class BezierLineElement extends LineElement<[Point, Point, Point, Point]> {
   get path2d(): Path2D {
     return new Path2D(
-      this.points.map(([begin, c1, c2, end]) => `M ${begin.join(' ')} C ${c1.join(' ')} , ${c2.join(' ')} , ${end.join(' ')}`).join(' ')
-    )
+      this.points
+        .map(([begin, c1, c2, end]) => `M ${begin.join(" ")} C ${c1.join(" ")} , ${c2.join(" ")} , ${end.join(" ")}`)
+        .join(" ")
+    );
   }
 
   draw(ctx: CanvasRenderingContext2D) {

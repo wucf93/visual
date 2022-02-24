@@ -6,16 +6,16 @@ export interface BaseElementOptions {
 }
 
 export abstract class BaseElement {
-  public _uid: number;
+  public uid: number;
   public x;
   public y;
   public width;
   public height;
 
-  static _uid = 1;
+  static U_ID = 1;
 
   constructor(options?: BaseElementOptions) {
-    this._uid = BaseElement._uid++;
+    this.uid = BaseElement.U_ID++;
     this.x = options?.x || 0;
     this.y = options?.y || 0;
     this.width = options?.width || 0;
@@ -30,5 +30,5 @@ export abstract class BaseElement {
   }
 
   abstract draw(ctx: CanvasRenderingContext2D): void;
-  abstract get path2d(): Path2D;
+  abstract isPointIn(ctx: CanvasRenderingContext2D, x: number, y: number): boolean;
 }

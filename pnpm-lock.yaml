@@ -8,6 +8,7 @@ specifiers:
   fit-curve: ^0.2.0
   less: ^4.1.2
   lodash: ^4.17.21
+  prettier: ^2.5.1
   typescript: ^4.5.5
   vite: ^2.8.2
 
@@ -21,6 +22,7 @@ devDependencies:
   '@typescript-eslint/parser': 5.12.0_eslint@8.9.0+typescript@4.5.5
   eslint: 8.9.0
   less: 4.1.2
+  prettier: 2.5.1
   typescript: 4.5.5
   vite: 2.8.2_less@4.1.2
 
@@ -1102,6 +1104,12 @@ packages:
   /prelude-ls/1.2.1:
     resolution: {integrity: sha1-3rxkidem5rDnYRiIzsiAM30xY5Y=}
     engines: {node: '>= 0.8.0'}
+    dev: true
+
+  /prettier/2.5.1:
+    resolution: {integrity: sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /prr/1.0.1:

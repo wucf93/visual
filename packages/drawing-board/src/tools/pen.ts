@@ -13,6 +13,8 @@ export class PenTool implements ToolBase {
 
   onDragStart({ renderer, offsetX, offsetY }: ToolEvent) {
     renderer.ctx.save();
+    renderer.ctx.lineCap = "round";
+    renderer.ctx.lineJoin = "round";
     renderer.ctx.beginPath();
     renderer.ctx.moveTo(offsetX, offsetY);
     this.strokeStyle && (renderer.ctx.strokeStyle = this.strokeStyle);

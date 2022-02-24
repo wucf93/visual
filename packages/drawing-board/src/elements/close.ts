@@ -6,10 +6,11 @@ export interface CloseElementOptions {
   lineWidth?: CanvasRenderingContext2D["lineWidth"];
 }
 
-export class CloseElement extends BaseElement {
+export abstract class CloseElement extends BaseElement {
   public strokeStyle;
   public lineWidth;
   public fillStyle;
+  protected abstract get path2d(): Path2D;
 
   constructor(options: CloseElementOptions & BaseElementOptions) {
     super(options);
@@ -24,16 +25,14 @@ export class CloseElement extends BaseElement {
     this.fillStyle && (ctx.fillStyle = this.fillStyle);
   }
 
-  get path2d(): Path2D {
-    throw new Error("Method not implemented.");
+  isPointIn(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    return ctx.isPointInPath(this.path2d, x, y);
   }
 }
 
 export class RectElement extends CloseElement {
-  get path2d() {
-    return new Path2D(
-      `M${this.x} ${this.y} h ${this.width} v ${this.height} h ${-this.width} Z`
-    )
+  protected get path2d() {
+    return new Path2D(`M${this.x} ${this.y} h ${this.width} v ${this.height} h ${-this.width} Z`);
   }
 
   draw(ctx: CanvasRenderingContext2D) {

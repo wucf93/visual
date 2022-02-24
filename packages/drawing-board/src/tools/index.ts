@@ -50,3 +50,4 @@ export * from "./pen";
 export * from './close';
 export * from "./staright";
 export * from './eraser';
+export * from './select';
