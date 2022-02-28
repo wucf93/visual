@@ -40,13 +40,15 @@ export class Renderer {
     this.ctx = ctx;
   }
 
-
-  exec(type: "add" | "remove", params: BaseElement) {
+  exec(type: "add" | "remove" | "select", params: BaseElement  ) {
     if (type === "add") {
       this._renderStore.push(params);
     } else if (type === "remove") {
-      this._renderStore = this._renderStore.filter(item => item !== params)
+      this._renderStore = this._renderStore.filter((item) => item !== params);
+    } else if (type === "select"){
+      params.checked = true;
     }
+    this.render();
   }
 
   render() {
@@ -61,7 +63,7 @@ export class Renderer {
 
   findElement(callback: (value: BaseElement) => boolean) {
     for (let i = this._renderStore.length - 1; i >= 0; i--) {
-      if (callback(this._renderStore[i])) return this._renderStore[i]
+      if (callback(this._renderStore[i])) return this._renderStore[i];
     }
   }
 
